@@ -27,20 +27,13 @@ public:
     void setSpacingScale(float scale) override
     {
         spacingScale = std::max(0.5f, scale);
-        effectiveGridSize = std::max(baseGridSize, static_cast<int>(baseGridSize * scale));
-    }
-
-    void setGridScale(float scale) override
-    {
-        gridScale = std::max(0.5f, scale);
-        effectiveGridSize = std::max(baseGridSize, static_cast<int>(baseGridSize * scale));
     }
 
     SpawnInfo createSpawn(const sf::Vector2u& areaSize,
                           const std::vector<sf::Vector2f>& occupiedPositions) override
     {
         const float spacing = baseSpacing * spacingScale;
-        const float scaledRadius = baseRadius * std::sqrt(spacingScale);
+        const float scaledRadius = baseRadius;
         const sf::Vector2f center(static_cast<float>(areaSize.x) * 0.5f,
                                   static_cast<float>(areaSize.y) * 0.5f);
 
@@ -125,7 +118,6 @@ private:
     float baseSpacing = 120.0f;
     float baseRadius = 35.0f;
     float spacingScale = 1.0f;
-    float gridScale = 1.0f;
     int requiredHits = 1;
     int desiredActiveCount = 3;
     float lifeTime = -1.0f;

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <iostream>
 #include <windows.h>
 
 #include "ResourceManager.h"
@@ -10,15 +11,21 @@
 namespace
 {
 constexpr float BackgroundWorldScale = 1.45f;
+constexpr float MinimumWorldScale = 1.45f;
+constexpr unsigned int InitialWindowWidth = 1024;
+constexpr unsigned int InitialWindowHeight = 768;
+constexpr float BaseWindowHeight = 768.0f;
 }
 
 Game::Game()
-    : window(sf::VideoMode({ 1024, 768 }), "Aimlab OOP Demo"),
+    : window(sf::VideoMode({ InitialWindowWidth, InitialWindowHeight }), "Aimlab OOP Demo", sf::Style::Titlebar | sf::Style::Close),
       targetPool(60),
       spawner(&targetPool, &simpleMode, 0.0f)
 {
     window.setFramerateLimit(144);
-    uiView = sf::View(sf::FloatRect(sf::Vector2f{ 0.f, 0.f }, sf::Vector2f{ 1024.f, 768.f }));
+    uiView = sf::View(sf::FloatRect(
+        sf::Vector2f{ 0.f, 0.f },
+        sf::Vector2f{ static_cast<float>(InitialWindowWidth), static_cast<float>(InitialWindowHeight) }));
 
     loadResources();
     initializeUi();
@@ -71,13 +78,16 @@ void Game::loadResources()
         backgroundSprite.emplace(*backgroundTexture);
         bgSize = backgroundTexture->getSize();
         view = sf::View(sf::FloatRect(
-            sf::Vector2f{ static_cast<float>(bgSize.x - 1024) * 0.5f,
-                          static_cast<float>(bgSize.y - 768) * 0.5f },
-            sf::Vector2f{ 1024.f, 768.f }));
+            sf::Vector2f{ (static_cast<float>(bgSize.x) - static_cast<float>(InitialWindowWidth)) * 0.5f,
+                          (static_cast<float>(bgSize.y) - static_cast<float>(InitialWindowHeight)) * 0.5f },
+            sf::Vector2f{ static_cast<float>(InitialWindowWidth), static_cast<float>(InitialWindowHeight) }));
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
-        view = sf::View(sf::FloatRect(sf::Vector2f{ 0.f, 0.f }, sf::Vector2f{ 1024.f, 768.f }));
+        std::cerr << "Failed to load background: " << e.what() << '\n';
+        view = sf::View(sf::FloatRect(
+            sf::Vector2f{ 0.f, 0.f },
+            sf::Vector2f{ static_cast<float>(InitialWindowWidth), static_cast<float>(InitialWindowHeight) }));
     }
     window.setView(view);
 
@@ -88,8 +98,9 @@ void Game::loadResources()
         uiFont = &resources.getFont("ui");
         UITheme::DefaultFont = uiFont;
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
+        std::cerr << "Failed to load UI font: " << e.what() << '\n';
         UITheme::DefaultFont = nullptr;
     }
 
@@ -117,8 +128,9 @@ void Game::loadResources()
         m4a1.setReloadVolume(80.0f);
         initUiClickSound(resources.getSoundBuffer("ui_click"));
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
+        std::cerr << "Failed to load one or more sound assets: " << e.what() << '\n';
     }
 }
 
@@ -130,6 +142,7 @@ void Game::initializeUi()
 
     if (!backgroundTexture || !uiManager.init(*backgroundTexture, window.getSize()))
     {
+        std::cerr << "Failed to initialize UI. Check background and font assets." << '\n';
         return;
     }
 
@@ -248,7 +261,6 @@ void Game::restartGame()
     targetPool.deactivateAll();
     scoreManager.reset();
     elapsedTime = 0.0f;
-    avgSecondsPerHit = 0.0f;
     infiniteAmmoEnabled = preferredInfiniteAmmo;
     selectWeapon(preferredWeaponIndex);
     selectMode(preferredModeIndex);
@@ -272,20 +284,6 @@ void Game::processEvents()
         {
             window.close();
             return;
-        }
-
-        if (const auto* resized = event->getIf<sf::Event::Resized>())
-        {
-            const sf::Vector2u ns = resized->size;
-            const sf::Vector2f oldCenter = view.getCenter();
-            view.setSize(sf::Vector2f{ static_cast<float>(ns.x), static_cast<float>(ns.y) });
-            view.setCenter(clampViewCenter(oldCenter));
-            window.setView(view);
-            uiView = sf::View(sf::FloatRect(
-                sf::Vector2f{ 0.f, 0.f },
-                sf::Vector2f{ static_cast<float>(ns.x), static_cast<float>(ns.y) }));
-            uiManager.onResize(ns);
-            updateWorldScale();
         }
 
         if (gameState != GameState::Playing)
@@ -494,7 +492,6 @@ void Game::toggleMode()
     targetPool.deactivateAll();
     scoreManager.reset();
     elapsedTime = 0.0f;
-    avgSecondsPerHit = 0.0f;
 }
 
 void Game::update(float deltaTime)
@@ -563,12 +560,10 @@ void Game::updateHUD()
 GameHUD::WeaponInfo Game::getWeaponInfo(Weapon* weapon, int index, bool active) const
 {
     static constexpr std::array<const char*, 3> shortNames = { "USP", "AK-47", "M4A1" };
-    static constexpr std::array<const char*, 3> fullNames = { "Pistol", "Assault Rifle", "Carbine" };
 
     const int safeIndex = std::clamp(index, 0, weaponCount - 1);
     GameHUD::WeaponInfo info;
     info.shortName = shortNames[safeIndex];
-    info.fullName = fullNames[safeIndex];
     info.keyIndex = safeIndex + 1;
     info.isActive = active;
     info.currentAmmo = weapon->getCurrentAmmo();
@@ -585,21 +580,22 @@ sf::Vector2u Game::getSpawnAreaSize() const
     const unsigned int viewH = window.getSize().y;
     const unsigned int scaledBgW = static_cast<unsigned int>(static_cast<float>(bgSize.x) * BackgroundWorldScale);
     const unsigned int scaledBgH = static_cast<unsigned int>(static_cast<float>(bgSize.y) * BackgroundWorldScale);
+    const unsigned int minWorldW = static_cast<unsigned int>(static_cast<float>(viewW) * MinimumWorldScale);
+    const unsigned int minWorldH = static_cast<unsigned int>(static_cast<float>(viewH) * MinimumWorldScale);
     return {
-        std::max({ scaledBgW, viewW, viewW * 3 / 2 }),
-        std::max({ scaledBgH, viewH, viewH * 3 / 2 })
+        std::max(scaledBgW, minWorldW),
+        std::max(scaledBgH, minWorldH)
     };
 }
 
 float Game::getResolutionScale() const
 {
-    return static_cast<float>(window.getSize().y) / 768.0f;
+    return static_cast<float>(window.getSize().y) / BaseWindowHeight;
 }
 
 void Game::updateWorldScale()
 {
     const float resScale = getResolutionScale();
-    spawner.setRadiusScale(resScale);
     spawner.setSpacingScale(resScale);
 
     if (!backgroundSprite || !backgroundTexture || bgSize.x == 0 || bgSize.y == 0)
@@ -667,8 +663,6 @@ void Game::tryFireOnce()
     if (hit)
     {
         scoreManager.recordHit();
-        const int hits = scoreManager.getHits();
-        avgSecondsPerHit = hits > 0 ? elapsedTime / static_cast<float>(hits) : 0.0f;
     }
     else
     {

@@ -13,7 +13,6 @@ public:
     explicit TargetSpawner(TargetPool* pool, GameMode* mode, float interval = 1.0f);
 
     void setMode(GameMode* mode);
-    void setRadiusScale(float scale);
     void setSpacingScale(float scale);
     void update(float deltaTime, const sf::Vector2u& areaSize);
 
@@ -25,6 +24,5 @@ private:
     GameMode* modeRef = nullptr;
     float spawnInterval = 1.0f;
     float timeSinceLastSpawn = 0.0f;
-    float radiusScale = 1.0f;
     float spacingScale = 1.0f;
 };

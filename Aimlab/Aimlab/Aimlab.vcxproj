@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -74,6 +66,10 @@
     <IncludePath>..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -133,10 +129,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;sfml-audio.lib;sfml-network.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\reload.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\ui_click.wav" "$(OutDir)" /y</Command>
-      <Message>Copying assets to output...</Message>
+      <Command>copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-graphics-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-window-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-system-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-audio-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-network-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\reload.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\ui_click.wav" "$(OutDir)" /y</Command>
+      <Message>Copying release SFML DLLs and assets to output...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

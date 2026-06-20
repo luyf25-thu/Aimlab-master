@@ -14,7 +14,6 @@ public:
     struct WeaponInfo
     {
         std::string shortName;
-        std::string fullName;
         std::string fireType;
         int keyIndex = 0;
         bool isActive = false;

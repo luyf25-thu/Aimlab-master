@@ -98,7 +98,6 @@ private:
     int preferredWeaponIndex = 0;
     int preferredModeIndex = 0;
     float elapsedTime = 0.0f;
-    float avgSecondsPerHit = 0.0f;
     float remainingTime = 60.0f;
     float roundTimeLimit = 60.0f;
 

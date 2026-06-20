@@ -17,13 +17,7 @@ void TargetSpawner::setMode(GameMode* mode)
     if (modeRef)
     {
         modeRef->setSpacingScale(spacingScale);
-        modeRef->setGridScale(spacingScale);
     }
-}
-
-void TargetSpawner::setRadiusScale(float scale)
-{
-    radiusScale = std::max(1.0f, scale);
 }
 
 void TargetSpawner::setSpacingScale(float scale)
@@ -64,13 +58,13 @@ void TargetSpawner::update(float deltaTime, const sf::Vector2u& areaSize)
         if (modeRef)
         {
             const SpawnInfo info = modeRef->createSpawn(areaSize, occupiedPositions);
-            target->init(info.position, info.radius * radiusScale, info.lifeTime,
+            target->init(info.position, info.radius, info.lifeTime,
                          info.requiredHits, info.baseColor);
             occupiedPositions.push_back(info.position);
         }
         else
         {
-            const float radius = MathUtils::getRandomFloat(15.0f, 35.0f) * radiusScale;
+            const float radius = MathUtils::getRandomFloat(15.0f, 35.0f);
             const float x = MathUtils::getRandomFloat(radius, static_cast<float>(areaSize.x) - radius);
             const float y = MathUtils::getRandomFloat(radius, static_cast<float>(areaSize.y) - radius);
             const float lifeTime = MathUtils::getRandomFloat(1.5f, 3.5f);

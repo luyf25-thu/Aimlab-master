@@ -39,9 +39,4 @@ public:
     {
         (void)scale;
     }
-
-    virtual void setGridScale(float scale)
-    {
-        (void)scale;
-    }
 };
