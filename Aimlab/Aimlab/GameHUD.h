@@ -71,7 +71,7 @@ private:
     std::array<std::optional<sf::Text>, 4> topRightTexts;
     std::array<std::optional<sf::Text>, 3> weaponSlotLabels;
     std::array<std::optional<sf::Text>, 3> weaponKeyHints;
-    std::array<std::optional<sf::Text>, 2> bottomTexts;
+    std::optional<sf::Text> ammoText;
 
     bool needsTextInit = false;
 };

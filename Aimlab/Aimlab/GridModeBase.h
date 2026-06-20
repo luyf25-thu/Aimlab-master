@@ -39,11 +39,10 @@ public:
     SpawnInfo createSpawn(const sf::Vector2u& areaSize,
                           const std::vector<sf::Vector2f>& occupiedPositions) override
     {
-        const sf::Vector2f center(static_cast<float>(areaSize.x) * 0.5f,
-                                  static_cast<float>(areaSize.y) * 0.5f);
-
         const float spacing = baseSpacing * spacingScale;
         const float scaledRadius = baseRadius * std::sqrt(spacingScale);
+        const sf::Vector2f center(static_cast<float>(areaSize.x) * 0.5f,
+                                  static_cast<float>(areaSize.y) * 0.5f);
 
         std::vector<sf::Vector2f> candidates;
         const int gs = effectiveGridSize;

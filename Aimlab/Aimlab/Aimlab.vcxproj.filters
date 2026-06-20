@@ -69,6 +69,12 @@
     <None Include="..\..\assets\usp_fire.wav">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="..\..\assets\reload.wav">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="..\..\assets\ui_click.wav">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceManager.h">

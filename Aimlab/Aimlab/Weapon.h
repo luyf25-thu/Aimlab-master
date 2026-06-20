@@ -1,7 +1,11 @@
-﻿#pragma once
+#pragma once
 
 #include <SFML/Audio.hpp>
+
+#include <cstddef>
 #include <optional>
+#include <vector>
+
 #include "RecoilComponent.h"
 
 struct WeaponConfig
@@ -56,6 +60,7 @@ public:
         }
         isReloading = true;
         reloadTimer = reloadDuration;
+        playReloadSound();
     }
 
     int getCurrentAmmo() const
@@ -85,14 +90,37 @@ public:
 
     void setFireSoundBuffer(const sf::SoundBuffer& buffer)
     {
-        fireSound.emplace(buffer);
+        fireSounds.clear();
+        fireSounds.reserve(soundPoolSize);
+        for (std::size_t i = 0; i < soundPoolSize; ++i)
+        {
+            fireSounds.emplace_back(buffer);
+            fireSounds.back().setVolume(fireVolume);
+        }
+        nextSoundIndex = 0;
     }
 
     void setFireVolume(float volume)
     {
-        if (fireSound)
+        fireVolume = volume;
+        for (auto& sound : fireSounds)
         {
-            fireSound->setVolume(volume);
+            sound.setVolume(fireVolume);
+        }
+    }
+
+    void setReloadSoundBuffer(const sf::SoundBuffer& buffer)
+    {
+        reloadSound.emplace(buffer);
+        reloadSound->setVolume(reloadVolume);
+    }
+
+    void setReloadVolume(float volume)
+    {
+        reloadVolume = volume;
+        if (reloadSound)
+        {
+            reloadSound->setVolume(reloadVolume);
         }
     }
 
@@ -132,10 +160,31 @@ protected:
         }
         timeSinceLastFire = 0.0f;
         recoil.applyRecoil();
-        if (fireSound)
+        playFireSound();
+    }
+
+    void playFireSound()
+    {
+        if (fireSounds.empty())
         {
-            fireSound->play();
+            return;
         }
+
+        sf::Sound& sound = fireSounds[nextSoundIndex];
+        sound.stop();
+        sound.play();
+        nextSoundIndex = (nextSoundIndex + 1) % fireSounds.size();
+    }
+
+    void playReloadSound()
+    {
+        if (!reloadSound)
+        {
+            return;
+        }
+
+        reloadSound->stop();
+        reloadSound->play();
     }
 
     RecoilComponent recoil;
@@ -143,11 +192,15 @@ protected:
     int currentAmmo = 0;
     float fireCooldown = 0.0f;
     float timeSinceLastFire = 0.0f;
-    std::optional<sf::Sound> fireSound;
+    static constexpr std::size_t soundPoolSize = 8;
+    std::vector<sf::Sound> fireSounds;
+    std::size_t nextSoundIndex = 0;
+    float fireVolume = 100.0f;
+    std::optional<sf::Sound> reloadSound;
+    float reloadVolume = 85.0f;
     bool isReloading = false;
     float reloadTimer = 0.0f;
     float reloadDuration = 2.0f;
     bool infiniteAmmo = false;
     bool automatic = false;
 };
-

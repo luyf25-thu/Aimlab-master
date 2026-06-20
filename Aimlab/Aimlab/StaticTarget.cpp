@@ -19,7 +19,7 @@ void StaticTarget::init(const sf::Vector2f& startPos, float r, float lifeTime,
     shape.setRadius(radius);
     shape.setOrigin({ radius, radius });
     shape.setPosition(position);
-    shape.setFillColor(baseColor);
+    applyVisualColor(baseColor);
 }
 
 void StaticTarget::update(float deltaTime)
@@ -70,12 +70,12 @@ bool StaticTarget::onHit()
         const float r = baseColor.r + (255.0f - baseColor.r) * lighten;
         const float g = baseColor.g + (255.0f - baseColor.g) * lighten;
         const float b = baseColor.b + (255.0f - baseColor.b) * lighten;
-        shape.setFillColor(sf::Color{ toByte(r), toByte(g), toByte(b) });
+        applyVisualColor(sf::Color{ toByte(r), toByte(g), toByte(b) });
         return false;
     }
 
     isHitState = true;
     hitTimer = hitDisplayDuration;
-    shape.setFillColor(sf::Color::Green);
+    applyVisualColor(sf::Color::Green);
     return true;
 }

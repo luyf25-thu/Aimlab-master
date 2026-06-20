@@ -116,7 +116,7 @@
       <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;sfml-audio-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-*-d-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y</Command>
+      <Command>copy "$(MSBuildProjectDirectory)\..\..\SFML\SFML-3.1.0-windows-vc17-64-bit\SFML-3.1.0\dll\sfml-*-d-3.dll" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\reload.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\ui_click.wav" "$(OutDir)" /y</Command>
       <Message>Copying SFML DLLs and assets to output...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -135,7 +135,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y</Command>
+      <Command>copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\reload.wav" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\ui_click.wav" "$(OutDir)" /y</Command>
       <Message>Copying assets to output...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -158,6 +158,8 @@
     <None Include="..\..\assets\ak47_fire.wav" />
     <None Include="guide.md" />
     <None Include="..\..\assets\m4a1_fire.wav" />
+    <None Include="..\..\assets\reload.wav" />
+    <None Include="..\..\assets\ui_click.wav" />
     <None Include="..\..\assets\usp_fire.wav" />
   </ItemGroup>
   <ItemGroup>

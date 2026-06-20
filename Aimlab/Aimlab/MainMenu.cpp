@@ -64,7 +64,7 @@ void MainMenu::render(sf::RenderWindow& window)
 void MainMenu::createElements()
 {
     titleText.emplace(*UITheme::DefaultFont);
-    titleText->setString("AIM TRAINER");
+    titleText->setString("Aimlab");
     titleText->setCharacterSize(52);
     titleText->setFillColor(UITheme::TextWhite);
     titleText->setStyle(sf::Text::Bold);

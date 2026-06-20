@@ -46,6 +46,7 @@ class UIButton
 {
 public:
     using Callback = std::function<void()>;
+    using ClickSoundCallback = std::function<void()>;
 
     UIButton() = default;
 
@@ -91,6 +92,14 @@ public:
     sf::Vector2f getSize() const { return bg.getSize(); }
     sf::FloatRect getBounds() const { return bg.getGlobalBounds(); }
     void setCallback(Callback cb) { callback = std::move(cb); }
+    static void setClickSoundCallback(ClickSoundCallback cb) { clickSoundCallback = std::move(cb); }
+    static void playClickSound()
+    {
+        if (clickSoundCallback)
+        {
+            clickSoundCallback();
+        }
+    }
 
     bool handleMouseMove(const sf::Vector2i& mousePos)
     {
@@ -104,6 +113,7 @@ public:
         if (getBounds().contains({ static_cast<float>(mousePos.x), static_cast<float>(mousePos.y) }))
         {
             applyPressedStyle();
+            playClickSound();
             if (callback) callback();
             return true;
         }
@@ -159,6 +169,7 @@ private:
     sf::RectangleShape bg;
     std::optional<sf::Text> labelText;
     Callback callback;
+    inline static ClickSoundCallback clickSoundCallback;
 };
 
 class UIText

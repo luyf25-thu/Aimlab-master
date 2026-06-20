@@ -113,6 +113,7 @@ void PauseOverlay::handleEvent(const sf::Event& event)
                 if (weaponBtns[i].getGlobalBounds().contains({ static_cast<float>(mp.x), static_cast<float>(mp.y) }))
                 {
                     setActiveWeapon(i);
+                    UIButton::playClickSound();
                     if (onWeaponSelected) onWeaponSelected(i);
                     return;
                 }

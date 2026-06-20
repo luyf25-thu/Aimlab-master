@@ -123,6 +123,7 @@ void HelpScreen::handleEvent(const sf::Event& event)
     {
         if (key->code == sf::Keyboard::Key::Escape || key->code == sf::Keyboard::Key::Backspace)
         {
+            UIButton::playClickSound();
             if (onStateChange) onStateChange(GameState::MainMenu);
         }
     }

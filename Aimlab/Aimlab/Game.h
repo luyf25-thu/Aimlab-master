@@ -1,10 +1,13 @@
 #pragma once
 
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <array>
+#include <cstddef>
 #include <filesystem>
 #include <optional>
+#include <vector>
 
 #include "Ak47.h"
 #include "Crosshair.h"
@@ -31,6 +34,8 @@ public:
 private:
     void loadResources();
     void initializeUi();
+    void initUiClickSound(const sf::SoundBuffer& buffer);
+    void playUiClickSound();
     void syncSettingsUi();
     void handleStateTransition(GameState newState);
     void restartGame();
@@ -106,4 +111,6 @@ private:
     std::optional<sf::Sprite> backgroundSprite;
     sf::Vector2u bgSize{ 0, 0 };
     sf::Font* uiFont = nullptr;
+    std::vector<sf::Sound> uiClickSounds;
+    std::size_t nextUiClickSound = 0;
 };

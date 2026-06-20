@@ -34,7 +34,7 @@ void GameHUD::initTexts()
     for (auto& t : topRightTexts) createText(t, 16, UITheme::TextGray);
     for (auto& t : weaponSlotLabels) createText(t, 13, UITheme::TextGray);
     for (auto& t : weaponKeyHints) createText(t, 11, UITheme::TextDim);
-    for (auto& t : bottomTexts) createText(t, 16, UITheme::TextWhite);
+    createText(ammoText, 16, UITheme::TextWhite);
 }
 
 void GameHUD::update(const WeaponInfo& active, const std::array<WeaponInfo, 3>& allWeapons,
@@ -60,7 +60,7 @@ void GameHUD::render(sf::RenderWindow& window)
     window.draw(ammoBarBg);
     window.draw(ammoBarFill);
 
-    for (auto& t : bottomTexts) if (t) window.draw(*t);
+    if (ammoText) window.draw(*ammoText);
     for (auto& t : weaponSlotLabels) if (t) window.draw(*t);
     for (auto& t : weaponKeyHints) if (t) window.draw(*t);
 }
@@ -234,31 +234,31 @@ void GameHUD::updateBottomBar(const WeaponInfo& active, const std::array<WeaponI
     const float ammoX = w - ammoBarW - w * 0.03f;
     const float ammoTextY = barY + barH * 0.45f;
 
-    if (bottomTexts[0])
+    if (ammoText)
     {
         std::ostringstream oss;
         if (active.isInfiniteAmmo)
         {
             oss << "INFINITE";
-            bottomTexts[0]->setFillColor(UITheme::AccentGreen);
+            ammoText->setFillColor(UITheme::AccentGreen);
         }
         else if (active.isReloading)
         {
             oss << "RELOADING...";
-            bottomTexts[0]->setFillColor(UITheme::AccentOrange);
+            ammoText->setFillColor(UITheme::AccentOrange);
         }
         else
         {
             oss << active.currentAmmo << " / " << active.ammoCapacity;
             const float ratio = active.ammoCapacity > 0
                 ? static_cast<float>(active.currentAmmo) / static_cast<float>(active.ammoCapacity) : 0.0f;
-            bottomTexts[0]->setFillColor(ratio < 0.25f ? UITheme::AccentRed : UITheme::TextWhite);
+            ammoText->setFillColor(ratio < 0.25f ? UITheme::AccentRed : UITheme::TextWhite);
         }
-        bottomTexts[0]->setString(oss.str());
-        const sf::FloatRect ab = bottomTexts[0]->getLocalBounds();
-        bottomTexts[0]->setOrigin({ ab.position.x + ab.size.x, ab.position.y + ab.size.y * 0.5f });
-        bottomTexts[0]->setPosition({ ammoX + ammoBarW, ammoTextY });
-        bottomTexts[0]->setCharacterSize(static_cast<unsigned int>(barH * 0.22f));
+        ammoText->setString(oss.str());
+        const sf::FloatRect ab = ammoText->getLocalBounds();
+        ammoText->setOrigin({ ab.position.x + ab.size.x, ab.position.y + ab.size.y * 0.5f });
+        ammoText->setPosition({ ammoX + ammoBarW, ammoTextY });
+        ammoText->setCharacterSize(static_cast<unsigned int>(barH * 0.22f));
     }
 
     const float ammoBarH = barH * 0.15f;
@@ -283,13 +283,4 @@ void GameHUD::updateBottomBar(const WeaponInfo& active, const std::array<WeaponI
     ammoBarFill.setSize({ fillW, ammoBarH - 4.0f });
     ammoBarFill.setPosition({ ammoX + 2.0f, ammoBarY + 2.0f });
     ammoBarFill.setFillColor(ratio < 0.25f ? UITheme::AmmoLow : UITheme::AmmoFill);
-
-    if (bottomTexts[1])
-    {
-        bottomTexts[1]->setString(active.fullName);
-        bottomTexts[1]->setCharacterSize(static_cast<unsigned int>(barH * 0.2f));
-        const sf::FloatRect nb = bottomTexts[1]->getLocalBounds();
-        bottomTexts[1]->setOrigin({ nb.position.x + nb.size.x * 0.5f, nb.position.y + nb.size.y });
-        bottomTexts[1]->setPosition({ ammoX + ammoBarW * 0.5f, ammoTextY - 2.0f });
-    }
 }

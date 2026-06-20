@@ -7,6 +7,11 @@
 #include "ResourceManager.h"
 #include "UITheme.h"
 
+namespace
+{
+constexpr float BackgroundWorldScale = 1.45f;
+}
+
 Game::Game()
     : window(sf::VideoMode({ 1024, 768 }), "Aimlab OOP Demo"),
       targetPool(60),
@@ -94,14 +99,23 @@ void Game::loadResources()
         resources.loadSoundBuffer("usp_fire", exeDir / "usp_fire.wav");
         resources.loadSoundBuffer("ak47_fire", exeDir / "ak47_fire.wav");
         resources.loadSoundBuffer("m4a1_fire", exeDir / "m4a1_fire.wav");
+        resources.loadSoundBuffer("reload", exeDir / "reload.wav");
+        resources.loadSoundBuffer("ui_click", exeDir / "ui_click.wav");
 
         usp.setFireSoundBuffer(resources.getSoundBuffer("usp_fire"));
         ak47.setFireSoundBuffer(resources.getSoundBuffer("ak47_fire"));
         m4a1.setFireSoundBuffer(resources.getSoundBuffer("m4a1_fire"));
+        usp.setReloadSoundBuffer(resources.getSoundBuffer("reload"));
+        ak47.setReloadSoundBuffer(resources.getSoundBuffer("reload"));
+        m4a1.setReloadSoundBuffer(resources.getSoundBuffer("reload"));
 
         usp.setFireVolume(65.0f);
         ak47.setFireVolume(72.0f);
         m4a1.setFireVolume(68.0f);
+        usp.setReloadVolume(80.0f);
+        ak47.setReloadVolume(80.0f);
+        m4a1.setReloadVolume(80.0f);
+        initUiClickSound(resources.getSoundBuffer("ui_click"));
     }
     catch (const std::exception&)
     {
@@ -110,6 +124,10 @@ void Game::loadResources()
 
 void Game::initializeUi()
 {
+    UIButton::setClickSoundCallback([this]() {
+        playUiClickSound();
+    });
+
     if (!backgroundTexture || !uiManager.init(*backgroundTexture, window.getSize()))
     {
         return;
@@ -137,6 +155,31 @@ void Game::initializeUi()
         adjustMouseSensitivity(delta);
     });
     syncSettingsUi();
+}
+
+void Game::initUiClickSound(const sf::SoundBuffer& buffer)
+{
+    uiClickSounds.clear();
+    uiClickSounds.reserve(8);
+    for (std::size_t i = 0; i < 8; ++i)
+    {
+        uiClickSounds.emplace_back(buffer);
+        uiClickSounds.back().setVolume(55.0f);
+    }
+    nextUiClickSound = 0;
+}
+
+void Game::playUiClickSound()
+{
+    if (uiClickSounds.empty())
+    {
+        return;
+    }
+
+    sf::Sound& sound = uiClickSounds[nextUiClickSound];
+    sound.stop();
+    sound.play();
+    nextUiClickSound = (nextUiClickSound + 1) % uiClickSounds.size();
 }
 
 void Game::syncSettingsUi()
@@ -266,14 +309,17 @@ void Game::handleNonPlayingHotkeys(const sf::Event& event)
 
     if (gameState == GameState::MainMenu)
     {
+        playUiClickSound();
         gameState = GameState::Exit;
     }
     else if (gameState == GameState::Paused)
     {
+        playUiClickSound();
         handleStateTransition(GameState::Playing);
     }
     else if (gameState == GameState::Help)
     {
+        playUiClickSound();
         handleStateTransition(GameState::MainMenu);
     }
 }
@@ -286,14 +332,17 @@ void Game::handlePlayingEvent(const sf::Event& event)
             key->code == sf::Keyboard::Key::P ||
             key->code == sf::Keyboard::Key::Space)
         {
+            playUiClickSound();
             handleStateTransition(GameState::Paused);
         }
         else if (key->code == sf::Keyboard::Key::M)
         {
+            playUiClickSound();
             toggleMode();
         }
         else if (key->code == sf::Keyboard::Key::X)
         {
+            playUiClickSound();
             infiniteAmmoEnabled = !infiniteAmmoEnabled;
             activeWeapon->setInfiniteAmmo(infiniteAmmoEnabled);
         }
@@ -303,10 +352,12 @@ void Game::handlePlayingEvent(const sf::Event& event)
         }
         else if (key->code == sf::Keyboard::Key::LBracket)
         {
+            playUiClickSound();
             adjustMouseSensitivity(-0.1f);
         }
         else if (key->code == sf::Keyboard::Key::RBracket)
         {
+            playUiClickSound();
             adjustMouseSensitivity(0.1f);
         }
         else
@@ -359,6 +410,7 @@ bool Game::trySelectWeaponSlot(const sf::Vector2i& mousePos)
         if (mousePos.x >= slotX && mousePos.x <= slotX + slotW &&
             mousePos.y >= slotY && mousePos.y <= slotY + slotH)
         {
+            playUiClickSound();
             selectWeapon(i);
             return true;
         }
@@ -394,14 +446,17 @@ void Game::handleWeaponSwitch(sf::Keyboard::Key key)
 {
     if (key == sf::Keyboard::Key::Num1)
     {
+        playUiClickSound();
         selectWeapon(0);
     }
     else if (key == sf::Keyboard::Key::Num2)
     {
+        playUiClickSound();
         selectWeapon(1);
     }
     else if (key == sf::Keyboard::Key::Num3)
     {
+        playUiClickSound();
         selectWeapon(2);
     }
 }
@@ -528,9 +583,11 @@ sf::Vector2u Game::getSpawnAreaSize() const
 {
     const unsigned int viewW = window.getSize().x;
     const unsigned int viewH = window.getSize().y;
+    const unsigned int scaledBgW = static_cast<unsigned int>(static_cast<float>(bgSize.x) * BackgroundWorldScale);
+    const unsigned int scaledBgH = static_cast<unsigned int>(static_cast<float>(bgSize.y) * BackgroundWorldScale);
     return {
-        std::max({ bgSize.x, viewW, viewW * 3 / 2 }),
-        std::max({ bgSize.y, viewH, viewH * 3 / 2 })
+        std::max({ scaledBgW, viewW, viewW * 3 / 2 }),
+        std::max({ scaledBgH, viewH, viewH * 3 / 2 })
     };
 }
 
