@@ -71,7 +71,7 @@ void SettingsScreen::init()
     });
 
     backButton = UIButton("Back", 20, { 170.0f, 42.0f }, { 0.0f, 0.0f });
-    backButton.setCallback([this]() { if (onStateChange) onStateChange(GameState::MainMenu); });
+    backButton.setCallback([this]() { if (onStateChange) onStateChange(backState); });
 
     updateLabels();
 }
@@ -125,6 +125,11 @@ void SettingsScreen::setSensitivity(float value)
     updateLabels();
 }
 
+void SettingsScreen::setBackState(GameState state)
+{
+    backState = state;
+}
+
 void SettingsScreen::onResize(const sf::Vector2u& windowSize)
 {
     viewSize = windowSize;
@@ -158,7 +163,7 @@ void SettingsScreen::handleEvent(const sf::Event& event)
     {
         if (key->code == sf::Keyboard::Key::Escape || key->code == sf::Keyboard::Key::Backspace)
         {
-            if (onStateChange) onStateChange(GameState::MainMenu);
+            if (onStateChange) onStateChange(backState);
         }
     }
 }

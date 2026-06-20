@@ -26,6 +26,7 @@ public:
     void setSelectedWeapon(int index);
     void setInfiniteAmmo(bool enabled);
     void setSensitivity(float value);
+    void setBackState(GameState state);
     void onResize(const sf::Vector2u& windowSize);
     void handleEvent(const sf::Event& event);
     void render(sf::RenderWindow& window);
@@ -50,6 +51,7 @@ private:
     int selectedWeapon = 0;
     bool infiniteAmmo = true;
     float sensitivity = 1.0f;
+    GameState backState = GameState::MainMenu;
 
     StateCallback onStateChange;
     std::function<void(int)> onModeSelected;

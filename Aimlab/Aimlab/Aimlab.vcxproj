@@ -134,6 +134,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(MSBuildProjectDirectory)\..\..\assets\background.jpg" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\font.ttf" "$(OutDir)" /y &amp; copy "$(MSBuildProjectDirectory)\..\..\assets\*_fire.wav" "$(OutDir)" /y</Command>
+      <Message>Copying assets to output...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />

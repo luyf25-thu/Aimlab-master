@@ -124,9 +124,6 @@ void Game::initializeUi()
     uiManager.setPauseWeaponCallback([this](int index) {
         selectWeapon(index);
     });
-    uiManager.setPauseSensitivityCallback([this](float delta) {
-        adjustMouseSensitivity(delta);
-    });
     uiManager.setSettingsModeCallback([this](int index) {
         setPreferredMode(index);
     });
@@ -176,10 +173,10 @@ void Game::handleStateTransition(GameState newState)
         if (newState == GameState::Paused)
         {
             uiManager.setPauseWeapon(activeWeaponIndex);
-            uiManager.setPauseSensitivity(mouseSensitivity);
         }
         if (newState == GameState::Settings)
         {
+            uiManager.setSettingsBackState(gameState == GameState::Paused ? GameState::Paused : GameState::MainMenu);
             syncSettingsUi();
         }
     }
@@ -276,10 +273,6 @@ void Game::handleNonPlayingHotkeys(const sf::Event& event)
         handleStateTransition(GameState::Playing);
     }
     else if (gameState == GameState::Help)
-    {
-        handleStateTransition(GameState::MainMenu);
-    }
-    else if (gameState == GameState::Settings)
     {
         handleStateTransition(GameState::MainMenu);
     }
@@ -586,7 +579,6 @@ void Game::setPreferredInfiniteAmmo(bool enabled)
 void Game::adjustMouseSensitivity(float delta)
 {
     mouseSensitivity = std::clamp(mouseSensitivity + delta, 0.2f, 3.0f);
-    uiManager.setPauseSensitivity(mouseSensitivity);
     uiManager.setSettingsSensitivity(mouseSensitivity);
 }
 

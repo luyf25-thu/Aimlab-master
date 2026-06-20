@@ -28,15 +28,14 @@ public:
     void updateResultStats(int hits, int misses, int totalShots,
                            float accuracy, float avgTime, float totalTime);
     void setPauseWeapon(int idx);
-    void setPauseSensitivity(float value);
     void setPauseRestartCallback(std::function<void()> cb);
     void setPauseWeaponCallback(std::function<void(int)> cb);
-    void setPauseSensitivityCallback(std::function<void(float)> cb);
     void setResultRestartCallback(std::function<void()> cb);
     void setSettingsMode(int index);
     void setSettingsWeapon(int index);
     void setSettingsInfiniteAmmo(bool enabled);
     void setSettingsSensitivity(float value);
+    void setSettingsBackState(GameState state);
     void setSettingsModeCallback(std::function<void(int)> cb);
     void setSettingsWeaponCallback(std::function<void(int)> cb);
     void setSettingsInfiniteAmmoCallback(std::function<void(bool)> cb);

@@ -133,11 +133,6 @@ void UIManager::setPauseWeapon(int idx)
     pauseOverlay.setActiveWeapon(idx);
 }
 
-void UIManager::setPauseSensitivity(float value)
-{
-    pauseOverlay.setSensitivity(value);
-}
-
 void UIManager::setPauseRestartCallback(std::function<void()> cb)
 {
     pauseOverlay.setRestartCallback(std::move(cb));
@@ -146,11 +141,6 @@ void UIManager::setPauseRestartCallback(std::function<void()> cb)
 void UIManager::setPauseWeaponCallback(std::function<void(int)> cb)
 {
     pauseOverlay.setWeaponCallback(std::move(cb));
-}
-
-void UIManager::setPauseSensitivityCallback(std::function<void(float)> cb)
-{
-    pauseOverlay.setSensitivityCallback(std::move(cb));
 }
 
 void UIManager::setResultRestartCallback(std::function<void()> cb)
@@ -176,6 +166,11 @@ void UIManager::setSettingsInfiniteAmmo(bool enabled)
 void UIManager::setSettingsSensitivity(float value)
 {
     settingsScreen.setSensitivity(value);
+}
+
+void UIManager::setSettingsBackState(GameState state)
+{
+    settingsScreen.setBackState(state);
 }
 
 void UIManager::setSettingsModeCallback(std::function<void(int)> cb)

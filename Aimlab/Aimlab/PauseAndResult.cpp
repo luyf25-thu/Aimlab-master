@@ -32,7 +32,11 @@ void PauseOverlay::init()
     });
 
     buttons[2] = UIButton("Main Menu", 22, btnSize, { 0, 0 });
-    buttons[2].setCallback([this]() { if (onStateChange) onStateChange(GameState::MainMenu); });
+    buttons[2] = UIButton("Settings", 22, btnSize, { 0, 0 });
+    buttons[2].setCallback([this]() { if (onStateChange) onStateChange(GameState::Settings); });
+
+    buttons[3] = UIButton("Main Menu", 22, btnSize, { 0, 0 });
+    buttons[3].setCallback([this]() { if (onStateChange) onStateChange(GameState::MainMenu); });
 
     const char* wnames[] = { "USP", "AK-47", "M4A1" };
     for (int i = 0; i < 3; ++i)
@@ -45,21 +49,6 @@ void PauseOverlay::init()
         weaponLabels[i]->setCharacterSize(18);
         weaponLabels[i]->setFillColor(UITheme::TextWhite);
     }
-
-    sensitivityText.emplace(*UITheme::DefaultFont);
-    sensitivityText->setCharacterSize(18);
-    sensitivityText->setFillColor(UITheme::TextWhite);
-    setSensitivity(sensitivity);
-
-    sensitivityButtons[0] = UIButton("-", 22, { 44.0f, 36.0f }, { 0, 0 });
-    sensitivityButtons[0].setCallback([this]() {
-        if (onSensitivityChanged) onSensitivityChanged(-0.1f);
-    });
-
-    sensitivityButtons[1] = UIButton("+", 22, { 44.0f, 36.0f }, { 0, 0 });
-    sensitivityButtons[1].setCallback([this]() {
-        if (onSensitivityChanged) onSensitivityChanged(0.1f);
-    });
 }
 
 void PauseOverlay::setActiveWeapon(int idx)
@@ -71,19 +60,6 @@ void PauseOverlay::setActiveWeapon(int idx)
         weaponBtns[i].setOutlineColor(i == activeWeaponIndex ? sf::Color::White : UITheme::BtnBorder);
         weaponBtns[i].setOutlineThickness(i == activeWeaponIndex ? 2.0f : 1.0f);
     }
-}
-
-void PauseOverlay::setSensitivity(float value)
-{
-    sensitivity = value;
-    if (!sensitivityText)
-    {
-        return;
-    }
-
-    std::ostringstream oss;
-    oss << "Sensitivity " << std::fixed << std::setprecision(1) << sensitivity;
-    sensitivityText->setString(oss.str());
 }
 
 void PauseOverlay::setStateCallback(StateCallback cb)
@@ -101,11 +77,6 @@ void PauseOverlay::setWeaponCallback(std::function<void(int)> cb)
     onWeaponSelected = std::move(cb);
 }
 
-void PauseOverlay::setSensitivityCallback(std::function<void(float)> cb)
-{
-    onSensitivityChanged = std::move(cb);
-}
-
 void PauseOverlay::onResize(const sf::Vector2u& windowSize)
 {
     viewSize = windowSize;
@@ -118,7 +89,6 @@ void PauseOverlay::handleEvent(const sf::Event& event)
     {
         const sf::Vector2i mp = { moved->position.x, moved->position.y };
         for (auto& btn : buttons) btn.handleMouseMove(mp);
-        for (auto& btn : sensitivityButtons) btn.handleMouseMove(mp);
         for (int i = 0; i < 3; ++i)
         {
             if (weaponBtns[i].getGlobalBounds().contains({ static_cast<float>(mp.x), static_cast<float>(mp.y) }))
@@ -147,7 +117,6 @@ void PauseOverlay::handleEvent(const sf::Event& event)
                     return;
                 }
             }
-            for (auto& btn : sensitivityButtons) btn.handleClick(mp);
             for (auto& btn : buttons) btn.handleClick(mp);
         }
     }
@@ -163,9 +132,6 @@ void PauseOverlay::render(sf::RenderWindow& window)
         window.draw(weaponBtns[i]);
         if (weaponLabels[i]) window.draw(*weaponLabels[i]);
     }
-
-    if (sensitivityText) window.draw(*sensitivityText);
-    for (auto& btn : sensitivityButtons) btn.render(window);
 
     for (auto& btn : buttons) btn.render(window);
     if (hintText) window.draw(*hintText);
@@ -208,38 +174,19 @@ void PauseOverlay::layout()
         }
     }
 
-    const float sensY = cy - h * 0.025f;
-    const float sensBtnW = w * 0.045f;
-    const float sensBtnH = h * 0.052f;
-    const float sensBtnGap = w * 0.13f;
-    sensitivityButtons[0].setSize({ sensBtnW, sensBtnH });
-    sensitivityButtons[0].setFontSize(static_cast<unsigned int>(h * 0.03f));
-    sensitivityButtons[1].setSize({ sensBtnW, sensBtnH });
-    sensitivityButtons[1].setFontSize(static_cast<unsigned int>(h * 0.03f));
-    sensitivityButtons[0].setPosition({ cx - sensBtnGap, sensY });
-    sensitivityButtons[1].setPosition({ cx + sensBtnGap - sensBtnW, sensY });
-
-    if (sensitivityText)
-    {
-        sensitivityText->setCharacterSize(static_cast<unsigned int>(h * 0.028f));
-        const sf::FloatRect sb = sensitivityText->getLocalBounds();
-        sensitivityText->setOrigin({ sb.position.x + sb.size.x * 0.5f, sb.position.y + sb.size.y * 0.5f });
-        sensitivityText->setPosition({ cx, sensY + sensBtnH * 0.5f });
-    }
-
     const float btnW = w * 0.28f;
     const float btnH = h * 0.065f;
     const unsigned int btnFontSize = static_cast<unsigned int>(h * 0.032f);
-    buttons[0].setSize({ btnW, btnH });
-    buttons[0].setFontSize(btnFontSize);
-    buttons[1].setSize({ btnW, btnH });
-    buttons[1].setFontSize(btnFontSize);
-    buttons[2].setSize({ btnW, btnH });
-    buttons[2].setFontSize(btnFontSize);
+    for (auto& btn : buttons)
+    {
+        btn.setSize({ btnW, btnH });
+        btn.setFontSize(btnFontSize);
+    }
     const float btnX = cx - btnW * 0.5f;
-    buttons[0].setPosition({ btnX, cy + h * 0.04f });
-    buttons[1].setPosition({ btnX, cy + h * 0.125f });
-    buttons[2].setPosition({ btnX, cy + h * 0.21f });
+    buttons[0].setPosition({ btnX, cy - h * 0.015f });
+    buttons[1].setPosition({ btnX, cy + h * 0.065f });
+    buttons[2].setPosition({ btnX, cy + h * 0.145f });
+    buttons[3].setPosition({ btnX, cy + h * 0.225f });
 
     if (hintText)
     {

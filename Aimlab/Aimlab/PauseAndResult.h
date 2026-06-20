@@ -18,11 +18,9 @@ public:
 
     void init();
     void setActiveWeapon(int idx);
-    void setSensitivity(float value);
     void setStateCallback(StateCallback cb);
     void setRestartCallback(std::function<void()> cb);
     void setWeaponCallback(std::function<void(int)> cb);
-    void setSensitivityCallback(std::function<void(float)> cb);
     void onResize(const sf::Vector2u& windowSize);
     void handleEvent(const sf::Event& event);
     void render(sf::RenderWindow& window);
@@ -34,17 +32,13 @@ private:
     std::optional<sf::Text> pauseTitle;
     std::array<sf::RectangleShape, 3> weaponBtns;
     std::array<std::optional<sf::Text>, 3> weaponLabels;
-    std::optional<sf::Text> sensitivityText;
-    std::array<UIButton, 2> sensitivityButtons;
-    std::array<UIButton, 3> buttons;
+    std::array<UIButton, 4> buttons;
     std::optional<sf::Text> hintText;
     sf::Vector2u viewSize{ 800, 600 };
     int activeWeaponIndex = 0;
-    float sensitivity = 1.0f;
     StateCallback onStateChange;
     std::function<void()> onRestartRequested;
     std::function<void(int)> onWeaponSelected;
-    std::function<void(float)> onSensitivityChanged;
 };
 
 class ResultScreen
